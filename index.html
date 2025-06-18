@@ -1,32 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mini Juegos</title>
-  <style>
-    body {
-      background: #111;
-      color: #eee;
-      font-family: monospace;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    a.button {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 20px;
-      background: #222;
-      color: #eee;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Mini Juegos - Menú</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  body {
+    background: #111;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 {
+    margin-bottom: 40px;
+  }
+  .game-menu {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
+  }
+  .game-button {
+    background: #222;
+    border: 3px solid #0f0;
+    border-radius: 10px;
+    width: 220px;
+    cursor: pointer;
+    text-align: center;
+    color: #0f0;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    box-shadow: 0 0 15px #0f0;
+  }
+  .game-button:hover {
+    background: #0f0;
+    color: #111;
+  }
+  .preview {
+    width: 220px;
+    height: 120px;
+    background: #000;
+    border-bottom: 3px solid #0f0;
+    overflow: hidden;
+  }
+  .preview img, .preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .game-label {
+    padding: 12px 0;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+</style>
 </head>
 <body>
-  <h1>🎮 Mini Juegos</h1>
-  <a class="button" href="snake.html">🐍 Snake</a>
-  <a class="button" href="pong.html">🏓 Pong</a>
-  <a class="button" href="flappy.html">🐤 Flappy Bird</a>
+  <h1>Mini Juegos</h1>
+  <div class="game-menu">
+    <a href="snake.html" class="game-button" title="Snake">
+      <div class="preview">
+        <img src="snake_preview.png" alt="Snake preview" />
+      </div>
+      <div class="game-label">Snake</div>
+    </a>
+    <a href="pong.html" class="game-button" title="Pong">
+      <div class="preview">
+        <img src="pong_preview.png" alt="Pong preview" />
+      </div>
+      <div class="game-label">Pong</div>
+    </a>
+    <a href="flappy.html" class="game-button" title="Flappy Bird">
+      <div class="preview">
+        <img src="flappy_preview.png" alt="Flappy Bird preview" />
+      </div>
+      <div class="game-label">Flappy Bird</div>
+    </a>
+  </div>
 </body>
 </html>
