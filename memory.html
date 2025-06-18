@@ -28,9 +28,9 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
-    border: 4px solid #eee;
     border-radius: 12px;
-    background: #222;
+    border: 4px solid #eee;
+    background: transparent;
   }
   .card.flipped {
     transform: rotateY(180deg);
@@ -39,28 +39,27 @@
   .card .front, .card .back {
     position: absolute;
     width: 100%; height: 100%;
-    backface-visibility: hidden;
     border-radius: 12px;
+    backface-visibility: hidden;
   }
+  /* Reverso carta */
   .card .front {
-    background: #eee;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 48px;
-    color: #222;
-  }
-  .card .back {
     background: linear-gradient(135deg, #ff3c3c, #ff9a3c);
-    transform: rotateY(180deg);
     box-shadow:
       inset 0 0 0 6px #eee,
       0 6px 10px rgba(0,0,0,0.5);
   }
+  /* Anverso carta con símbolo */
+  .card .back {
+    background: #eee;
+    transform: rotateY(180deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-  /* Pixel-art style suits */
+  /* Símbolos pixel art */
 
-  /* Hearts */
   .heart {
     position: relative;
     width: 38px;
@@ -88,20 +87,17 @@
     transform-origin: 0 100%;
   }
 
-  /* Diamonds */
   .diamond {
     width: 38px;
     height: 38px;
-    background: #ff3;
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     background-color: #d50000;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     box-shadow:
       2px 2px 0 #ff7777,
       -2px 2px 0 #ff7777,
       0 0 6px #f00 inset;
   }
 
-  /* Clubs */
   .club {
     position: relative;
     width: 38px;
@@ -138,7 +134,6 @@
     border-radius: 4px;
   }
 
-  /* Spades */
   .spade {
     position: relative;
     width: 38px;
@@ -188,24 +183,11 @@
   <button id="restart" style="display:none;">Reiniciar</button>
 
 <script>
-  // Cartas y sus símbolos CSS
-  const cardTypes = [
-    'heart', 'heart',
-    'diamond', 'diamond',
-    'club', 'club',
-    'spade', 'spade',
-    'heart', 'heart',
-    'diamond', 'diamond'
-  ];
-
-  // Elige 6 pares diferentes para jugar (usamos 6 pares = 12 cartas)
-  // Mejor mezclar bien
+  // Pares de cartas (6 pares = 12 cartas)
   const suits = ['heart', 'diamond', 'club', 'spade', 'heart', 'diamond'];
-
-  // Aquí sólo se usan 6 pares (12 cartas)
   const cards = suits.concat(suits);
 
-  // Barajar cartas
+  // Barajar
   function shuffle(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -216,7 +198,7 @@
     return array;
   }
 
-  let shuffledCards = shuffle(cards);
+  let shuffledCards;
 
   const gameDiv = document.getElementById('game');
   const messageDiv = document.getElementById('message');
@@ -232,19 +214,17 @@
     card.classList.add('card');
     card.dataset.type = type;
 
-    // Front (símbolo)
     const front = document.createElement('div');
     front.classList.add('front');
+    card.appendChild(front);
 
-    const symbol = document.createElement('div');
-    symbol.classList.add(type);
-    front.appendChild(symbol);
-
-    // Back
     const back = document.createElement('div');
     back.classList.add('back');
 
-    card.appendChild(front);
+    const symbol = document.createElement('div');
+    symbol.classList.add(type);
+    back.appendChild(symbol);
+
     card.appendChild(back);
 
     card.addEventListener('click', () => {
@@ -258,14 +238,16 @@
         firstCard = card;
         return;
       }
+
       secondCard = card;
       lockBoard = true;
 
       if (firstCard.dataset.type === secondCard.dataset.type) {
-        matches += 1;
+        matches++;
         firstCard = null;
         secondCard = null;
         lockBoard = false;
+
         if (matches === cards.length / 2) {
           messageDiv.textContent = "¡Ganaste! 🎉";
           restartBtn.style.display = "inline-block";
