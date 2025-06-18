@@ -2,334 +2,96 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Memoria Cartas Poker Pixel Art</title>
+<title>Mini Juegos - Menú</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
   body {
-    font-family: 'Press Start 2P', cursive;
-    background: #222;
-    color: #eee;
+    background: #111;
+    font-family: 'Press Start 2P', monospace;
+    color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding: 30px 10px;
-    user-select: none;
+    padding: 30px;
   }
   h1 {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
   }
-  #game {
-    display: grid;
-    grid-template-columns: repeat(4, 90px);
-    grid-gap: 15px;
-    perspective: 600px;
+  .game-menu {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
   }
-  .card {
-    width: 90px;
-    height: 110px;
+  .game-button {
+    background: #222;
+    border: 3px solid #0f0;
+    border-radius: 10px;
+    width: 220px;
     cursor: pointer;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
-    border: 4px solid #eee;
-    border-radius: 12px;
-    background: transparent;
-    box-shadow: 0 0 10px #000 inset;
+    text-align: center;
+    color: #0f0;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    box-shadow: 0 0 15px #0f0;
   }
-  .card.flipped {
-    transform: rotateY(180deg);
-    cursor: default;
+  .game-button:hover {
+    background: #0f0;
+    color: #111;
   }
-  .card .front, .card .back {
-    position: absolute;
+  .preview {
+    width: 220px;
+    height: 120px;
+    background: #000;
+    border-bottom: 3px solid #0f0;
+    overflow: hidden;
+  }
+  .preview img, .preview video {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
-    backface-visibility: hidden;
-    image-rendering: pixelated;
+    object-fit: cover;
+    display: block;
   }
-
-  /* REVERSO (Front) */
-  .card .front {
-    background: repeating-conic-gradient(
-      from 0deg,
-      #aa0000 0deg 45deg,
-      #880000 45deg 90deg
-    );
-    box-shadow: inset 0 0 0 4px #eee;
-  }
-
-  /* ANVERSO (Back) */
-  .card .back {
-    background: #121212;
-    transform: rotateY(180deg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  /* Símbolos pixel art */
-
-  /* Corazón */
-  .heart {
-    width: 36px;
-    height: 32px;
-    position: relative;
-  }
-  .heart::before,
-  .heart::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 24px;
-    background: #d50000;
-    border-radius: 8px 8px 0 0;
-    top: 0;
-  }
-  .heart::before {
-    left: 0;
-    transform: rotate(-45deg);
-    transform-origin: 100% 100%;
-  }
-  .heart::after {
-    left: 15px;
-    transform: rotate(45deg);
-    transform-origin: 0 100%;
-  }
-
-  /* Diamante */
-  .diamond {
-    width: 36px;
-    height: 36px;
-    background-color: #d50000;
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-    box-shadow:
-      2px 2px 0 #ff7777,
-      -2px 2px 0 #ff7777,
-      0 0 6px #f00 inset;
-  }
-
-  /* Trébol */
-  .club {
-    position: relative;
-    width: 36px;
-    height: 38px;
-  }
-  .club .circle {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: #222;
-    border-radius: 50%;
-    border: 3px solid #eee;
-  }
-  .club .circle:nth-child(1) {
-    top: 0;
-    left: 8px;
-  }
-  .club .circle:nth-child(2) {
-    top: 8px;
-    left: 0;
-  }
-  .club .circle:nth-child(3) {
-    top: 8px;
-    left: 16px;
-  }
-  .club .stem {
-    position: absolute;
-    bottom: 0;
-    left: 12px;
-    width: 8px;
-    height: 16px;
-    background: #222;
-    border: 3px solid #eee;
-    border-radius: 3px;
-  }
-
-  /* Pica */
-  .spade {
-    position: relative;
-    width: 36px;
-    height: 38px;
-    background-color: #222;
-    clip-path: polygon(50% 0%, 90% 60%, 50% 100%, 10% 60%);
-    border-radius: 10px 10px 0 0;
-    border: 3px solid #eee;
-  }
-  .spade::after {
-    content: "";
-    position: absolute;
-    bottom: -16px;
-    left: 12px;
-    width: 8px;
-    height: 16px;
-    background: #222;
-    border: 3px solid #eee;
-    border-radius: 3px;
-  }
-
-  #message {
-    margin: 25px 0 10px;
-    font-size: 1rem;
-  }
-  #restart-btn {
-    cursor: pointer;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.7rem;
-    padding: 8px 15px;
-    border: none;
-    background: #d50000;
-    color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #a00000;
-    display: none;
-  }
-  #restart-btn:hover {
-    background: #ff0000;
+  .game-label {
+    padding: 12px 0;
+    font-size: 14px;
+    letter-spacing: 1px;
   }
 </style>
 </head>
 <body>
-  <h1>Juego de Memoria - Cartas Póker Pixel Art</h1>
-  <div id="game"></div>
-  <div id="message"></div>
-  <button id="restart-btn">Reiniciar Juego</button>
-
-<script>
-  const cardTypes = ['heart', 'diamond', 'club', 'spade'];
-  let cards = [];
-  let firstCard = null;
-  let secondCard = null;
-  let lockBoard = false;
-  let matches = 0;
-
-  const game = document.getElementById('game');
-  const messageDiv = document.getElementById('message');
-  const restartBtn = document.getElementById('restart-btn');
-
-  function createCard(type) {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.type = type;
-
-    // Front = reverso (visible al principio)
-    const front = document.createElement('div');
-    front.classList.add('front');
-
-    // Back = símbolo pixelart
-    const back = document.createElement('div');
-    back.classList.add('back');
-
-    if (type === 'heart') {
-      const symbol = document.createElement('div');
-      symbol.classList.add('heart');
-      back.appendChild(symbol);
-    } else if (type === 'diamond') {
-      const symbol = document.createElement('div');
-      symbol.classList.add('diamond');
-      back.appendChild(symbol);
-    } else if (type === 'club') {
-      const symbol = document.createElement('div');
-      symbol.classList.add('club');
-
-      // Crear 3 círculos y tallo para trébol
-      for (let i = 0; i < 3; i++) {
-        const circle = document.createElement('div');
-        circle.classList.add('circle');
-        if (i === 0) circle.style.top = '0px';
-        if (i === 1) circle.style.top = '8px';
-        if (i === 2) circle.style.top = '8px';
-        circle.style.left = i === 0 ? '8px' : i === 1 ? '0px' : '16px';
-        symbol.appendChild(circle);
-      }
-      const stem = document.createElement('div');
-      stem.classList.add('stem');
-      symbol.appendChild(stem);
-
-      back.appendChild(symbol);
-    } else if (type === 'spade') {
-      const symbol = document.createElement('div');
-      symbol.classList.add('spade');
-      back.appendChild(symbol);
-    }
-
-    card.appendChild(front);
-    card.appendChild(back);
-
-    card.addEventListener('click', () => {
-      if (lockBoard) return;
-      if (card === firstCard) return;
-      if (card.classList.contains('flipped')) return;
-
-      card.classList.add('flipped');
-
-      if (!firstCard) {
-        firstCard = card;
-        return;
-      }
-
-      secondCard = card;
-      lockBoard = true;
-
-      if (firstCard.dataset.type === secondCard.dataset.type) {
-        matches++;
-        firstCard = null;
-        secondCard = null;
-        lockBoard = false;
-        if (matches === cards.length / 2) {
-          messageDiv.textContent = "¡Ganaste! 🎉";
-          restartBtn.style.display = "inline-block";
-        }
-      } else {
-        setTimeout(() => {
-          firstCard.classList.remove('flipped');
-          secondCard.classList.remove('flipped');
-          firstCard = null;
-          secondCard = null;
-          lockBoard = false;
-        }, 1000);
-      }
-    });
-
-    return card;
-  }
-
-  function startGame() {
-    messageDiv.textContent = '';
-    restartBtn.style.display = 'none';
-    matches = 0;
-    firstCard = null;
-    secondCard = null;
-    lockBoard = false;
-    game.innerHTML = '';
-    cards = [];
-
-    // Duplicar tipos para parejas
-    const pairTypes = cardTypes.concat(cardTypes);
-
-    // Barajar parejas (Fisher-Yates)
-    for (let i = pairTypes.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pairTypes[i], pairTypes[j]] = [pairTypes[j], pairTypes[i]];
-    }
-
-    pairTypes.forEach(type => {
-      const card = createCard(type);
-      cards.push(card);
-      game.appendChild(card);
-    });
-  }
-
-  restartBtn.addEventListener('click', () => {
-    startGame();
-  });
-
-  startGame();
-</script>
+  <h1>Mini Juegos</h1>
+  <div class="game-menu">
+    <a href="snake.html" class="game-button" title="Snake">
+      <div class="preview">
+        <img src="snake_preview.png" alt="Snake preview" />
+      </div>
+      <div class="game-label">Snake</div>
+    </a>
+    <a href="pong.html" class="game-button" title="Pong">
+      <div class="preview">
+        <img src="pong_preview.png" alt="Pong preview" />
+      </div>
+      <div class="game-label">Pong</div>
+    </a>
+    <a href="flappy.html" class="game-button" title="Flappy Bird">
+      <div class="preview">
+        <img src="flappy_preview.png" alt="Flappy Bird preview" />
+      </div>
+      <div class="game-label">Flappy Bird</div>
+    </a>
+    <a href="blockdodge.html" class="game-button" title="blockdodge">
+      <div class="preview">
+        <img src="blockdodge.png" alt="blockdodge preview" />
+      </div>
+      <div class="game-label">blockdodge</div>
+    </a>
+    <a href="memory.html" class="game-button" title="memory">
+      <div class="preview">
+        <img src="memory.png" alt="memory preview" />
+      </div>
+      <div class="game-label">Poker memory</div>
+    </a>
 </body>
 </html>
