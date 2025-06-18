@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy</title>
+  <style>
+    body { background: #111; color: #eee; text-align: center; font-family: monospace; }
+    canvas { background: #000; display: block; margin: 20px auto; }
+    .back { margin-top: 10px; display: inline-block; color: #ff0; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>🐤 Flappy Bird</h1>
+  <canvas id="flappy" width="400" height="500"></canvas>
+  <div>Puntos: <span id="score">0</span></div>
+  <a class="back" href="index.html">⬅ Volver</a>
+  <script>
+    const canvas = document.getElementById("flappy");
+    const ctx = canvas.getContext("2d");
+
+    let birdY = 150, gravity = 0.6, lift = -10, velocity = 0;
+    let pipes = [];
+    let frame = 0;
+    let score = 0;
+
+    document.addEventListener("keydown", () => velocity = lift);
+
+    function draw() {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, 400, 500);
+
+      velocity += gravity;
+      birdY += velocity;
+      ctx.fillStyle = "#ff0";
+      ctx.fillRect(50, birdY, 20, 20);
+
+      if (frame % 90 === 0) {
+        let top = Math.random() * 200 + 50;
+        pipes.push({x: 400, top: top, bottom: top + 120});
+      }
+
+      for (let i = 0; i < pipes.length; i++) {
+        let p = pipes[i];
+        p.x -= 2;
+
+        ctx.fillStyle = "#0f0";
+        ctx.fillRect(p.x, 0, 40, p.top);
+        ctx.fillRect(p.x, p.bottom, 40, 500);
+
+        if (50 + 20 > p.x && 50 < p.x + 40 &&
+            (birdY < p.top || birdY + 20 > p.bottom)) {
+          alert("💥 Perdiste. Puntos: " + score);
+          location.href = "index.html";
+        }
+
+        if (p.x + 40 === 50) {
+          score++;
+          document.getElementById("score").textContent = score;
+        }
+      }
+
+      if (birdY > 500 || birdY < 0) {
+        alert("💥 Perdiste. Puntos: " + score);
+        location.href = "index.html";
+      }
+
+      frame++;
+    }
+
+    setInterval(draw, 1000 / 60);
+  </script>
+</body>
+</html>
