@@ -3,65 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <title>Pong</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    body { background: #111; color: #eee; text-align: center; font-family: monospace; }
-    canvas { background: #000; display: block; margin: 20px auto; }
-    .back { margin-top: 10px; display: inline-block; color: #0ff; text-decoration: none; }
+    body {
+      margin: 0;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      font-family: 'Press Start 2P', monospace;
+    }
+    canvas {
+      background: #000;
+      display: block;
+      margin: 20px auto;
+      border: 4px solid white;
+    }
+    .back, .restart {
+      display: inline-block;
+      margin: 10px 5px;
+      padding: 10px 20px;
+      background: #222;
+      border: 2px solid #0f0;
+      color: #0f0;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .gameover {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>🏓 Pong</h1>
-  <canvas id="pong" width="600" height="400"></canvas>
-  <a class="back" href="index.html">⬅ Volver</a>
+  <h1>Pong</h1>
+  <canvas id="game" width="600" height="400"></canvas>
+  <div id="gameover" class="gameover" style="display:none;">
+    <p>💀 GAME OVER 💀</p>
+    <p>Puntaje: <span id="finalscore">0</span></p>
+    <button class="restart" onclick="restartGame()">Reiniciar</button>
+    <a class="back" href="index.html">Inicio</a>
+  </div>
+
   <script>
-    const canvas = document.getElementById("pong");
+    const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
-    let player = { x: 10, y: 150, w: 10, h: 100 };
-    let ai = { x: 580, y: 150, w: 10, h: 100 };
-    let ball = { x: 300, y: 200, r: 8, dx: 4, dy: 4 };
+    const paddleWidth = 10, paddleHeight = 80;
+    let playerY = canvas.height / 2 - paddleHeight / 2;
+    let aiY = canvas.height / 2 - paddleHeight / 2;
+    let ballX = canvas.width / 2, ballY = canvas.height / 2;
+    let ballSpeedX = 5, ballSpeedY = 3;
+    let upPressed = false, downPressed = false;
+    let score = 0;
+    let gameRunning = true;
 
-    canvas.addEventListener("mousemove", e => {
-      const rect = canvas.getBoundingClientRect();
-      player.y = e.clientY - rect.top - player.h / 2;
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp") upPressed = true;
+      if (e.key === "ArrowDown") downPressed = true;
     });
 
-    function draw() {
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, 600, 400);
+    document.addEventListener("keyup", e => {
+      if (e.key === "ArrowUp") upPressed = false;
+      if (e.key === "ArrowDown") downPressed = false;
+    });
 
+    function resetBall() {
+      ballX = canvas.width / 2;
+      ballY = canvas.height / 2;
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY = (Math.random() * 4 - 2);
+    }
+
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById("finalscore").textContent = score;
+      document.getElementById("gameover").style.display = "block";
+    }
+
+    function restartGame() {
+      score = 0;
+      playerY = canvas.height / 2 - paddleHeight / 2;
+      aiY = canvas.height / 2 - paddleHeight / 2;
+      resetBall();
+      gameRunning = true;
+      document.getElementById("gameover").style.display = "none";
+    }
+
+    function draw() {
+      if (!gameRunning) return;
+
+      // fondo
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // jugador
+      if (upPressed && playerY > 0) playerY -= 6;
+      if (downPressed && playerY + paddleHeight < canvas.height) playerY += 6;
+
+      // IA básica
+      if (aiY + paddleHeight / 2 < ballY) aiY += 4;
+      else if (aiY + paddleHeight / 2 > ballY) aiY -= 4;
+
+      // pelotas
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      // rebote superior/inferior
+      if (ballY <= 0 || ballY >= canvas.height) ballSpeedY *= -1;
+
+      // colisión con jugador
+      if (ballX <= 20 && ballY > playerY && ballY < playerY + paddleHeight) {
+        ballSpeedX *= -1.1;
+        ballSpeedY *= 1.05;
+        score++;
+      }
+
+      // colisión con IA
+      if (ballX >= canvas.width - 20 && ballY > aiY && ballY < aiY + paddleHeight) {
+        ballSpeedX *= -1.1;
+        ballSpeedY *= 1.05;
+      }
+
+      // perder
+      if (ballX < 0) gameOver();
+
+      // dibujo
       ctx.fillStyle = "#0f0";
-      ctx.fillRect(player.x, player.y, player.w, player.h);
-      ctx.fillStyle = "#f00";
-      ctx.fillRect(ai.x, ai.y, ai.w, ai.h);
+      ctx.fillRect(10, playerY, paddleWidth, paddleHeight);
+      ctx.fillRect(canvas.width - 20, aiY, paddleWidth, paddleHeight);
+      ctx.fillStyle = "white";
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
-      ctx.fillStyle = "#fff";
+      ctx.arc(ballX, ballY, 7, 0, Math.PI * 2);
       ctx.fill();
 
-      ball.x += ball.dx;
-      ball.y += ball.dy;
-
-      if (ball.y < 0 || ball.y > 400) ball.dy *= -1;
-
-      if (ball.x - ball.r < player.x + player.w &&
-          ball.y > player.y && ball.y < player.y + player.h) {
-        ball.dx *= -1.1;
-        ball.x = player.x + player.w + ball.r;
-      }
-
-      if (ball.x + ball.r > ai.x &&
-          ball.y > ai.y && ball.y < ai.y + ai.h) {
-        ball.dx *= -1.1;
-        ball.x = ai.x - ball.r;
-      }
-
-      if (ball.x < 0 || ball.x > 600) {
-        alert("💥 Fin del juego");
-        location.href = "index.html";
-      }
-
-      ai.y += ((ball.y - ai.y - ai.h / 2) * 0.05);
+      // marcador
+      ctx.fillStyle = "#0f0";
+      ctx.fillText("Puntos: " + score, 20, 20);
     }
 
     setInterval(draw, 1000 / 60);
