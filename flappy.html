@@ -213,11 +213,11 @@
 
         // Colisión ajustada
         if (
-          birdX + spriteWidth / 2 > pipe.x + collisionMarginX &&
-          birdX - spriteWidth / 2 < pipe.x + pipeWidth - collisionMarginX &&
+          birdX + spriteWidth / 1 > pipe.x + collisionMarginX &&
+          birdX - spriteWidth / 1 < pipe.x + pipeWidth - collisionMarginX &&
           (
-            birdY - spriteHeight / 2 < pipe.top + collisionMarginY ||
-            birdY + spriteHeight / 2 > pipe.top + gap - collisionMarginY
+            birdY - spriteHeight / 1 < pipe.top + collisionMarginY ||
+            birdY + spriteHeight / 1 > pipe.top + gap - collisionMarginY
           )
         ) {
           gameOver();
