@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Block Dodge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+    }
+    #gameContainer {
+      position: relative;
+      margin: 20px auto;
+      width: 400px;
+      height: 500px;
+      border: 4px solid white;
+      background: #000;
+      overflow: hidden;
+    }
+    canvas {
+      background: #000;
+      display: block;
+    }
+    .gameover {
+      display: none;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .btn {
+      background: #222;
+      color: #0f0;
+      border: 2px solid #0f0;
+      padding: 10px 20px;
+      margin: 10px 5px;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      text-decoration: none;
+      display: inline-block;
+    }
+    h1 {
+      font-family: 'Press Start 2P', monospace;
+      color: #fff;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Block Dodge</h1>
+  <div id="gameContainer">
+    <canvas id="game" width="400" height="500"></canvas>
+  </div>
+
+  <div class="gameover" id="gameover">
+    <p>GAME OVER</p>
+    <p>Puntos: <span id="scoreDisplay">0</span></p>
+    <button class="btn" onclick="startGame()">Reiniciar</button>
+    <a class="btn" href="index.html">Inicio</a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    let player = { x: 180, y: 460, w: 40, h: 20, speed: 5 };
+    let blocks = [];
+    let score = 0;
+    let gameRunning = false;
+    let blockTimer = 0;
+    let difficulty = 1;
+
+    function startGame() {
+      player.x = 180;
+      blocks = [];
+      score = 0;
+      gameRunning = true;
+      blockTimer = 0;
+      difficulty = 1;
+      document.getElementById("gameover").style.display = "none";
+    }
+
+    function drawPlayer() {
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+    }
+
+    function drawBlocks() {
+      ctx.fillStyle = "#f00";
+      blocks.forEach(block => {
+        ctx.fillRect(block.x, block.y, block.w, block.h);
+      });
+    }
+
+    function updateBlocks() {
+      blockTimer++;
+      if (blockTimer > 40 - difficulty) {
+        const blockWidth = 40 + Math.random() * 60;
+        const x = Math.random() * (canvas.width - blockWidth);
+        blocks.push({ x: x, y: -20, w: blockWidth, h: 20, speed: 2 + difficulty * 0.5 });
+        blockTimer = 0;
+      }
+
+      blocks.forEach(block => block.y += block.speed);
+      blocks = blocks.filter(block => block.y < canvas.height);
+
+      blocks.forEach(block => {
+        if (
+          player.x < block.x + block.w &&
+          player.x + player.w > block.x &&
+          player.y < block.y + block.h &&
+          player.y + player.h > block.y
+        ) {
+          gameOver();
+        }
+      });
+    }
+
+    function drawScore() {
+      ctx.fillStyle = "#fff";
+      ctx.font = "12px 'Press Start 2P'";
+      ctx.fillText("Puntos: " + score, 20, 20);
+    }
+
+    function gameOver() {
+      gameRunning = false;
+      document.getElementById("scoreDisplay").textContent = score;
+      document.getElementById("gameover").style.display = "block";
+    }
+
+    function update() {
+      if (!gameRunning) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawPlayer();
+      drawBlocks();
+      drawScore();
+      updateBlocks();
+
+      score++;
+      if (score % 200 === 0) difficulty++;
+    }
+
+    document.addEventListener("keydown", e => {
+      if (!gameRunning) return;
+      if (e.key === "ArrowLeft" || e.key === "a") {
+        player.x -= player.speed;
+        if (player.x < 0) player.x = 0;
+      } else if (e.key === "ArrowRight" || e.key === "d") {
+        player.x += player.speed;
+        if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+      }
+    });
+
+    setInterval(update, 1000 / 60);
+    startGame();
+  </script>
+</body>
+</html>
