@@ -65,15 +65,28 @@
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
-    let player = { x: 180, y: 460, w: 40, h: 20, speed: 5 };
+    // Player propiedades
+    let player = { 
+      x: 180, 
+      y: 460, 
+      w: 40, 
+      h: 60,  // más alto para cuerpo
+      speed: 8,  // más rápido
+      dx: 0
+    };
+
     let blocks = [];
     let score = 0;
     let gameRunning = false;
     let blockTimer = 0;
     let difficulty = 1;
 
+    // Detectar teclas pulsadas para movimiento suave
+    let keys = { left: false, right: false };
+
     function startGame() {
       player.x = 180;
+      player.dx = 0;
       blocks = [];
       score = 0;
       gameRunning = true;
@@ -83,8 +96,13 @@
     }
 
     function drawPlayer() {
+      // Dibujar cabeza (círculo)
       ctx.fillStyle = "#fff";
-      ctx.fillRect(player.x, player.y, player.w, player.h);
+      ctx.beginPath();
+      ctx.arc(player.x + player.w / 2, player.y + 15, 12, 0, Math.PI * 2);
+      ctx.fill();
+      // Dibujar cuerpo (rectángulo)
+      ctx.fillRect(player.x + 10, player.y + 27, player.w - 20, player.h - 27);
     }
 
     function drawBlocks() {
@@ -133,6 +151,21 @@
     function update() {
       if (!gameRunning) return;
 
+      // Movimiento suave del jugador
+      if (keys.left) {
+        player.dx = -player.speed;
+      } else if (keys.right) {
+        player.dx = player.speed;
+      } else {
+        player.dx = 0;
+      }
+
+      player.x += player.dx;
+
+      // Limitar dentro del canvas
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       drawPlayer();
@@ -144,14 +177,21 @@
       if (score % 200 === 0) difficulty++;
     }
 
+    // Eventos para movimiento suave
     document.addEventListener("keydown", e => {
       if (!gameRunning) return;
       if (e.key === "ArrowLeft" || e.key === "a") {
-        player.x -= player.speed;
-        if (player.x < 0) player.x = 0;
+        keys.left = true;
       } else if (e.key === "ArrowRight" || e.key === "d") {
-        player.x += player.speed;
-        if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+        keys.right = true;
+      }
+    });
+
+    document.addEventListener("keyup", e => {
+      if (e.key === "ArrowLeft" || e.key === "a") {
+        keys.left = false;
+      } else if (e.key === "ArrowRight" || e.key === "d") {
+        keys.right = false;
       }
     });
 
