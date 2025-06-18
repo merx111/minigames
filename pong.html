@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pong</title>
+  <style>
+    body { background: #111; color: #eee; text-align: center; font-family: monospace; }
+    canvas { background: #000; display: block; margin: 20px auto; }
+    .back { margin-top: 10px; display: inline-block; color: #0ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>🏓 Pong</h1>
+  <canvas id="pong" width="600" height="400"></canvas>
+  <a class="back" href="index.html">⬅ Volver</a>
+  <script>
+    const canvas = document.getElementById("pong");
+    const ctx = canvas.getContext("2d");
+
+    let player = { x: 10, y: 150, w: 10, h: 100 };
+    let ai = { x: 580, y: 150, w: 10, h: 100 };
+    let ball = { x: 300, y: 200, r: 8, dx: 4, dy: 4 };
+
+    canvas.addEventListener("mousemove", e => {
+      const rect = canvas.getBoundingClientRect();
+      player.y = e.clientY - rect.top - player.h / 2;
+    });
+
+    function draw() {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, 600, 400);
+
+      ctx.fillStyle = "#0f0";
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+      ctx.fillStyle = "#f00";
+      ctx.fillRect(ai.x, ai.y, ai.w, ai.h);
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      if (ball.y < 0 || ball.y > 400) ball.dy *= -1;
+
+      if (ball.x - ball.r < player.x + player.w &&
+          ball.y > player.y && ball.y < player.y + player.h) {
+        ball.dx *= -1.1;
+        ball.x = player.x + player.w + ball.r;
+      }
+
+      if (ball.x + ball.r > ai.x &&
+          ball.y > ai.y && ball.y < ai.y + ai.h) {
+        ball.dx *= -1.1;
+        ball.x = ai.x - ball.r;
+      }
+
+      if (ball.x < 0 || ball.x > 600) {
+        alert("💥 Fin del juego");
+        location.href = "index.html";
+      }
+
+      ai.y += ((ball.y - ai.y - ai.h / 2) * 0.05);
+    }
+
+    setInterval(draw, 1000 / 60);
+  </script>
+</body>
+</html>
