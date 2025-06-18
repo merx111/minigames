@@ -4,9 +4,25 @@
   <meta charset="UTF-8">
   <title>Snake</title>
   <style>
-    body { margin: 0; background: #111; color: #eee; text-align: center; font-family: monospace; }
-    canvas { background: #000; display: block; margin: 20px auto; }
-    .back { margin-top: 10px; display: inline-block; color: #0f0; text-decoration: none; }
+    body {
+      margin: 0;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      font-family: monospace;
+    }
+    canvas {
+      background: #000;
+      display: block;
+      margin: 20px auto;
+      border: 4px solid white;
+    }
+    .back {
+      margin-top: 10px;
+      display: inline-block;
+      color: #0f0;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -19,41 +35,68 @@
     const ctx = canvas.getContext("2d");
     const box = 30;
     let snake = [{x: 10, y: 10}];
-    let food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-    let dx = 0, dy = 0, score = 0;
+    let food = spawnFood();
+    let dx = 0, dy = 0;
+    let score = 0;
+    let started = false;
+
+    function spawnFood() {
+      return {
+        x: Math.floor(Math.random() * 20),
+        y: Math.floor(Math.random() * 20)
+      };
+    }
 
     document.addEventListener("keydown", e => {
-      if (e.key === "ArrowLeft" && dx === 0) dx = -1, dy = 0;
-      if (e.key === "ArrowRight" && dx === 0) dx = 1, dy = 0;
-      if (e.key === "ArrowUp" && dy === 0) dx = 0, dy = -1;
-      if (e.key === "ArrowDown" && dy === 0) dx = 0, dy = 1;
+      if (!started && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+        started = true;
+      }
+      if (e.key === "ArrowLeft" && dx === 0) { dx = -1; dy = 0; }
+      if (e.key === "ArrowRight" && dx === 0) { dx = 1; dy = 0; }
+      if (e.key === "ArrowUp" && dy === 0) { dx = 0; dy = -1; }
+      if (e.key === "ArrowDown" && dy === 0) { dx = 0; dy = 1; }
     });
 
     function draw() {
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Marco blanco
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(0, 0, box * 20, box * 20);
+
+      // Dibuja la serpiente
       for (let s of snake) {
         ctx.fillStyle = "#0f0";
-        ctx.fillRect(s.x * box, s.y * box, box-1, box-1);
+        ctx.fillRect(s.x * box, s.y * box, box - 1, box - 1);
       }
 
+      // Dibuja la fruta
       ctx.fillStyle = "red";
-      ctx.fillRect(food.x * box, food.y * box, box-1, box-1);
+      ctx.fillRect(food.x * box, food.y * box, box - 1, box - 1);
 
-      let head = {x: snake[0].x + dx, y: snake[0].y + dy};
+      if (!started) return; // No mover hasta que se presione una flecha
 
-      if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 ||
-          snake.some(s => s.x === head.x && s.y === head.y)) {
+      // Nueva cabeza
+      let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+      // Colisión
+      if (
+        head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 ||
+        snake.some(s => s.x === head.x && s.y === head.y)
+      ) {
         alert("💀 Game Over. Puntos: " + score);
         location.href = "index.html";
+        return;
       }
 
       snake.unshift(head);
+
       if (head.x === food.x && head.y === food.y) {
         score++;
         document.getElementById("score").textContent = score;
-        food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+        food = spawnFood();
       } else {
         snake.pop();
       }
