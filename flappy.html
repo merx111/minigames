@@ -191,6 +191,10 @@
         pipes.push({ x: canvas.width, top: top, animProgress: 0 });
       }
 
+      // Margen para colisión más ajustada
+      const collisionMarginX = 8;
+      const collisionMarginY = 5;
+
       pipes.forEach(pipe => {
         pipe.x -= 2;
 
@@ -207,9 +211,14 @@
         const bottomHeight = (canvas.height - (pipe.top + gap)) * pipe.animProgress;
         ctx.fillRect(pipe.x, canvas.height - bottomHeight, pipeWidth, bottomHeight);
 
+        // Colisión ajustada
         if (
-          birdX + spriteWidth / 2 > pipe.x && birdX - spriteWidth / 2 < pipe.x + pipeWidth &&
-          (birdY - spriteHeight / 2 < pipe.top || birdY + spriteHeight / 2 > pipe.top + gap)
+          birdX + spriteWidth / 2 > pipe.x + collisionMarginX &&
+          birdX - spriteWidth / 2 < pipe.x + pipeWidth - collisionMarginX &&
+          (
+            birdY - spriteHeight / 2 < pipe.top + collisionMarginY ||
+            birdY + spriteHeight / 2 > pipe.top + gap - collisionMarginY
+          )
         ) {
           gameOver();
         }
