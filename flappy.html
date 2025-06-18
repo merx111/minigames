@@ -191,9 +191,13 @@
         pipes.push({ x: canvas.width, top: top, animProgress: 0 });
       }
 
-      // Margen para colisión más ajustada
-      const collisionMarginX = 8;
-      const collisionMarginY = 5;
+      // Hitbox del pájaro (más pequeño que el sprite)
+      const hitboxWidth = spriteWidth * 0.7;
+      const hitboxHeight = spriteHeight * 0.7;
+
+      // Margen para tubos (más pequeño para colisión justa)
+      const collisionMarginX = 6;
+      const collisionMarginY = 1;
 
       pipes.forEach(pipe => {
         pipe.x -= 2;
@@ -211,13 +215,13 @@
         const bottomHeight = (canvas.height - (pipe.top + gap)) * pipe.animProgress;
         ctx.fillRect(pipe.x, canvas.height - bottomHeight, pipeWidth, bottomHeight);
 
-        // Colisión ajustada
+        // Colisión ajustada con hitbox y margen pequeño
         if (
-          birdX + spriteWidth / 1 > pipe.x + collisionMarginX &&
-          birdX - spriteWidth / 1 < pipe.x + pipeWidth - collisionMarginX &&
+          birdX + hitboxWidth / 2 > pipe.x + collisionMarginX &&
+          birdX - hitboxWidth / 2 < pipe.x + pipeWidth - collisionMarginX &&
           (
-            birdY - spriteHeight / 1 < pipe.top + collisionMarginY ||
-            birdY + spriteHeight / 1 > pipe.top + gap - collisionMarginY
+            birdY - hitboxHeight / 2 < pipe.top + collisionMarginY ||
+            birdY + hitboxHeight / 2 > pipe.top + gap - collisionMarginY
           )
         ) {
           gameOver();
@@ -230,7 +234,7 @@
 
       pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
 
-      if (birdY + spriteHeight / 2 > canvas.height || birdY - spriteHeight / 2 < 0) {
+      if (birdY + hitboxHeight / 2 > canvas.height || birdY - hitboxHeight / 2 < 0) {
         gameOver();
       }
 
