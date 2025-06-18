@@ -248,9 +248,9 @@
   <div id="game"></div>
   <div id="message"></div>
   <button id="restart" style="display:none;">Reiniciar</button>
+  <button id="goHome" style="display:none;">Ir al inicio</button>
 
 <script>
-  // 8 tipos distintos, cada uno con 2 cartas
   const suits = ['heart', 'diamond', 'club', 'spade', 'star', 'moon', 'lightning', 'crown'];
   const cards = suits.concat(suits);
 
@@ -267,6 +267,7 @@
   const gameDiv = document.getElementById('game');
   const messageDiv = document.getElementById('message');
   const restartBtn = document.getElementById('restart');
+  const goHomeBtn = document.getElementById('goHome');
 
   let firstCard = null;
   let secondCard = null;
@@ -315,6 +316,7 @@
         if (matches === cards.length / 2) {
           messageDiv.textContent = "¡Ganaste! 🎉";
           restartBtn.style.display = "inline-block";
+          goHomeBtn.style.display = "inline-block";
         }
       } else {
         setTimeout(() => {
@@ -334,6 +336,7 @@
     gameDiv.innerHTML = "";
     messageDiv.textContent = "";
     restartBtn.style.display = "none";
+    goHomeBtn.style.display = "none";
     firstCard = null;
     secondCard = null;
     lockBoard = false;
@@ -346,6 +349,12 @@
   }
 
   restartBtn.addEventListener('click', initGame);
+  goHomeBtn.addEventListener('click', () => {
+    // Aquí puedes poner la URL a la que quieres ir al inicio
+    // window.location.href = "index.html";
+    // Por ahora recarga la página:
+    window.location.reload();
+  });
 
   initGame();
 </script>
