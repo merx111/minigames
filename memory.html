@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Memory Game Pixel Art</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  body {
+    margin:0; padding:20px; background:#121212; color:#eee;
+    font-family: 'Press Start 2P', monospace;
+    display:flex; flex-direction: column; align-items: center;
+    user-select: none;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  #game {
+    display: grid;
+    grid-template-columns: repeat(4, 90px);
+    grid-gap: 15px;
+    perspective: 600px;
+  }
+  .card {
+    width: 90px; height: 110px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    border: 4px solid #eee;
+    border-radius: 12px;
+    background: #222;
+  }
+  .card.flipped {
+    transform: rotateY(180deg);
+    cursor: default;
+  }
+  .card .front, .card .back {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+  }
+  .card .front {
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    color: #222;
+  }
+  .card .back {
+    background: linear-gradient(135deg, #ff3c3c, #ff9a3c);
+    transform: rotateY(180deg);
+    box-shadow:
+      inset 0 0 0 6px #eee,
+      0 6px 10px rgba(0,0,0,0.5);
+  }
+
+  /* Pixel-art style suits */
+
+  /* Hearts */
+  .heart {
+    position: relative;
+    width: 38px;
+    height: 34px;
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    background: #d50000;
+    border-radius: 20px 20px 0 0;
+    top: 0;
+    left: 9px;
+  }
+  .heart::before {
+    left: 0;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+  }
+  .heart::after {
+    left: 19px;
+    transform: rotate(45deg);
+    transform-origin: 0 100%;
+  }
+
+  /* Diamonds */
+  .diamond {
+    width: 38px;
+    height: 38px;
+    background: #ff3;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    background-color: #d50000;
+    box-shadow:
+      2px 2px 0 #ff7777,
+      -2px 2px 0 #ff7777,
+      0 0 6px #f00 inset;
+  }
+
+  /* Clubs */
+  .club {
+    position: relative;
+    width: 38px;
+    height: 40px;
+  }
+  .club .circle {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: #222;
+    border-radius: 50%;
+    border: 4px solid #eee;
+  }
+  .club .circle:nth-child(1) {
+    top: 0;
+    left: 10px;
+  }
+  .club .circle:nth-child(2) {
+    top: 10px;
+    left: 0;
+  }
+  .club .circle:nth-child(3) {
+    top: 10px;
+    left: 20px;
+  }
+  .club .stem {
+    position: absolute;
+    bottom: 0;
+    left: 14px;
+    width: 10px;
+    height: 20px;
+    background: #222;
+    border: 4px solid #eee;
+    border-radius: 4px;
+  }
+
+  /* Spades */
+  .spade {
+    position: relative;
+    width: 38px;
+    height: 40px;
+    background-color: #222;
+    clip-path: polygon(50% 0%, 90% 60%, 50% 100%, 10% 60%);
+    border-radius: 10px 10px 0 0;
+    border: 4px solid #eee;
+  }
+  .spade::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 14px;
+    width: 10px;
+    height: 20px;
+    background: #222;
+    border: 4px solid #eee;
+    border-radius: 4px;
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  button {
+    margin-top: 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 10px 16px;
+    background: #d50000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #ff3c3c;
+  }
+</style>
+</head>
+<body>
+  <h1>Memory Game Pixel Art</h1>
+  <div id="game"></div>
+  <div id="message"></div>
+  <button id="restart" style="display:none;">Reiniciar</button>
+
+<script>
+  // Cartas y sus símbolos CSS
+  const cardTypes = [
+    'heart', 'heart',
+    'diamond', 'diamond',
+    'club', 'club',
+    'spade', 'spade',
+    'heart', 'heart',
+    'diamond', 'diamond'
+  ];
+
+  // Elige 6 pares diferentes para jugar (usamos 6 pares = 12 cartas)
+  // Mejor mezclar bien
+  const suits = ['heart', 'diamond', 'club', 'spade', 'heart', 'diamond'];
+
+  // Aquí sólo se usan 6 pares (12 cartas)
+  const cards = suits.concat(suits);
+
+  // Barajar cartas
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+
+  let shuffledCards = shuffle(cards);
+
+  const gameDiv = document.getElementById('game');
+  const messageDiv = document.getElementById('message');
+  const restartBtn = document.getElementById('restart');
+
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let matches = 0;
+
+  function createCard(type) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.type = type;
+
+    // Front (símbolo)
+    const front = document.createElement('div');
+    front.classList.add('front');
+
+    const symbol = document.createElement('div');
+    symbol.classList.add(type);
+    front.appendChild(symbol);
+
+    // Back
+    const back = document.createElement('div');
+    back.classList.add('back');
+
+    card.appendChild(front);
+    card.appendChild(back);
+
+    card.addEventListener('click', () => {
+      if (lockBoard) return;
+      if (card === firstCard) return;
+      if (card.classList.contains('flipped')) return;
+
+      card.classList.add('flipped');
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+      secondCard = card;
+      lockBoard = true;
+
+      if (firstCard.dataset.type === secondCard.dataset.type) {
+        matches += 1;
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+        if (matches === cards.length / 2) {
+          messageDiv.textContent = "¡Ganaste! 🎉";
+          restartBtn.style.display = "inline-block";
+        }
+      } else {
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          firstCard = null;
+          secondCard = null;
+          lockBoard = false;
+        }, 1000);
+      }
+    });
+
+    return card;
+  }
+
+  function initGame() {
+    gameDiv.innerHTML = "";
+    messageDiv.textContent = "";
+    restartBtn.style.display = "none";
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+    matches = 0;
+
+    shuffledCards = shuffle(cards);
+
+    shuffledCards.forEach(type => {
+      const card = createCard(type);
+      gameDiv.appendChild(card);
+    });
+  }
+
+  restartBtn.addEventListener('click', initGame);
+
+  initGame();
+</script>
+</body>
+</html>
