@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Memory Game Pixel Art</title>
+<title>Memory Game Pixel Art 8 Pares</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -155,6 +155,73 @@
     border-radius: 4px;
   }
 
+  /* Nuevo símbolo: Star */
+  .star {
+    width: 38px;
+    height: 38px;
+    clip-path: polygon(
+      50% 0%, 61% 35%, 98% 35%, 68% 57%,
+      79% 91%, 50% 70%, 21% 91%, 32% 57%,
+      2% 35%, 39% 35%
+    );
+    background: gold;
+    box-shadow: 0 0 6px #ffea00 inset;
+  }
+
+  /* Nuevo símbolo: Moon */
+  .moon {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    background: #f0f0f0;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ccc inset;
+  }
+  .moon::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 12px;
+    width: 24px;
+    height: 24px;
+    background: #121212;
+    border-radius: 50%;
+  }
+
+  /* Nuevo símbolo: Lightning */
+  .lightning {
+    width: 28px;
+    height: 48px;
+    background: yellow;
+    clip-path: polygon(
+      50% 0%, 35% 40%, 55% 40%, 30% 100%, 70% 60%, 45% 60%
+    );
+    filter: drop-shadow(0 0 2px #ffa);
+  }
+
+  /* Nuevo símbolo: Crown */
+  .crown {
+    position: relative;
+    width: 38px;
+    height: 28px;
+    background: #d4af37;
+    clip-path: polygon(
+      0% 100%, 10% 30%, 25% 70%, 35% 30%, 50% 70%, 60% 30%, 75% 70%, 85% 30%, 100% 100%
+    );
+    box-shadow: 0 2px 4px #a57c1b inset;
+  }
+  .crown::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 7px;
+    width: 6px;
+    height: 6px;
+    background: #fffacd;
+    border-radius: 50%;
+    box-shadow: 18px 0 #fffacd, 36px 0 #fffacd;
+  }
+
   #message {
     margin-top: 20px;
     font-size: 16px;
@@ -177,17 +244,16 @@
 </style>
 </head>
 <body>
-  <h1>Memory Game Pixel Art</h1>
+  <h1>Memory Game Pixel Art 8 Pares</h1>
   <div id="game"></div>
   <div id="message"></div>
   <button id="restart" style="display:none;">Reiniciar</button>
 
 <script>
-  // Pares de cartas (6 pares = 12 cartas)
-  const suits = ['heart', 'diamond', 'club', 'spade', 'heart', 'diamond'];
+  // 8 tipos distintos, cada uno con 2 cartas
+  const suits = ['heart', 'diamond', 'club', 'spade', 'star', 'moon', 'lightning', 'crown'];
   const cards = suits.concat(suits);
 
-  // Barajar
   function shuffle(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -197,8 +263,6 @@
     }
     return array;
   }
-
-  let shuffledCards;
 
   const gameDiv = document.getElementById('game');
   const messageDiv = document.getElementById('message');
@@ -275,9 +339,7 @@
     lockBoard = false;
     matches = 0;
 
-    shuffledCards = shuffle(cards);
-
-    shuffledCards.forEach(type => {
+    shuffle(cards).forEach(type => {
       const card = createCard(type);
       gameDiv.appendChild(card);
     });
